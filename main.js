@@ -1,13 +1,17 @@
-
-import * as lib from "./lib.js"
-import Draw from "./DrawClass.js"
-import CridElement from "./GridClass.js"
-import RectElement from "./RectElement.js"
+/**
+ * Main entry script for grid drawing demo.
+ * 그리드 드로잉 데모의 메인 진입 스크립트입니다.
+ */
+import * as lib from "./lib.js";
+import Draw from "./DrawClass.js";
+import CridElement from "./GridClass.js";
+import RectElement from "./RectElement.js";
 
 const draw = new Draw(document.getElementById('myCanvas'));
 const grid = new CridElement({ draw });
-//grid.drawGridBackground({x: 200, y: 200, cols: 4, rows: 4, width: 300, height: 300, color: 'lightgray'});
 
+// Build grid elements and add them to the container.
+// 그리드 요소를 생성하여 컨테이너에 추가합니다.
 lib.buildGrid(grid, {
   b11: new RectElement({id: 'b11', color: 'red'}),
   b12: new RectElement({id: 'b12', color: 'blue'}),
@@ -20,7 +24,9 @@ lib.buildGrid(grid, {
   b33: new RectElement({id: 'b33', color: 'lime'})
 });
 
+// Render the grid contents.
+// 그리드 내용을 렌더링합니다.
 grid.drawGridElements({x: 200, y: 200, cols: 3, rows: 3, width: 300, height: 300, borderWidth: 2, defaultColor: 'lightgray'});
 
-lib.helloWorldPrint()
+lib.helloWorldPrint();
 

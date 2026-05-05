@@ -1,7 +1,18 @@
 import SuperElement from './SuperElement.js';
 import GridContainer from './GridContainer.js';
 
+/**
+ * CridElement manages a grid-like drawing container.
+ * 그리드 형태의 드로잉 컨테이너를 관리합니다.
+ */
 class CridElement extends SuperElement {
+  /**
+   * @param {Object} params - constructor parameters
+   * @param {Draw} [params.draw=null] - Draw instance for rendering
+   * @param {GridContainer|null} [params.container=null] - optional grid container
+   * @param {number} [params.rows=3] - default row count
+   * @param {number} [params.cols=3] - default column count
+   */
   constructor({
     draw = null,
     container = null,
@@ -22,25 +33,48 @@ class CridElement extends SuperElement {
     this.container = container || new GridContainer({rows, cols});
   }
 
+  /**
+   * Sets a new grid container.
+   * 그리드 컨테이너를 설정합니다.
+   * @param {GridContainer} container
+   */
   setContainer(container) {
     this.container = container;
   }
 
+  /**
+   * Returns the current grid container.
+   * 현재 그리드 컨테이너를 반환합니다.
+   * @returns {GridContainer}
+   */
   getContainer() {
     return this.container;
   }
 
+  /**
+   * Adds an element into the grid cell.
+   * 그리드 셀에 요소를 추가합니다.
+   * @param {number} row - row index
+   * @param {number} col - column index
+   * @param {*} element - drawable element
+   * @returns {*}
+   */
   addElement(row, col, element) {
     return this.container.addCell(row, col, element);
   }
 
+  /**
+   * Draws grid lines for the grid bounds.
+   * 그리드 바운드를 위한 선을 그립니다.
+   */
   drawGridLines({x = 0, y = 0, cols = 3, rows = 3, width = 120, height = 120, color = 'black'} = {}) {
     const cellWidth = width / cols;
     const cellHeight = height / rows;
     const startX = x - width / 2;
     const startY = y - height / 2;
 
-    // 가로선 그리기
+    // draw horizontal grid lines
+    // 가로 그리드 선 그리기
     for (let i = 0; i <= rows; i++) {
       this.draw.rect({
         x: x,
@@ -52,7 +86,8 @@ class CridElement extends SuperElement {
       });
     }
 
-    // 세로선 그리기
+    // draw vertical grid lines
+    // 세로 그리드 선 그리기
     for (let i = 0; i <= cols; i++) {
       this.draw.rect({
         x: startX + i * cellWidth,
@@ -65,13 +100,18 @@ class CridElement extends SuperElement {
     }
   }
 
+  /**
+   * Draws the grid background for each cell.
+   * 각 셀의 배경을 그립니다.
+   */
   drawGridBackground({x = 0, y = 0, cols = 3, rows = 3, width = 120, height = 120, borderWidth = 1, color = 'white'} = {}) {
     const cellWidth = width / cols;
     const cellHeight = height / rows;
     const startX = x - width / 2;
     const startY = y - height / 2;
 
-    // 각 셀의 배경 그리기
+    // draw each cell background
+    // 각 셀 배경 그리기
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const cellX = startX + col * cellWidth + cellWidth / 2;
@@ -91,6 +131,10 @@ class CridElement extends SuperElement {
     }
   }
 
+  /**
+   * Draws all elements stored in the grid container.
+   * 그리드 컨테이너의 모든 요소를 그립니다.
+   */
   drawGridElements({x = 0, y = 0, cols = 3, rows = 3, width = 120, height = 120, borderWidth = 1, defaultColor = 'gray'} = {}) {
     if (!this.container || !this.container.getCells || this.container.getCells().length === 0) {
       return;
