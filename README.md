@@ -64,23 +64,38 @@ grid.drawGridLines({x: 150, y: 150, width: 300, height: 300, color: 'black'});
 
 ### 3. **RectElement.js** - 직사각형 요소
 ```javascript
-class RectElement {
-  constructor({id, color, context = null})
+class RectElement extends SuperElement {
+  constructor({id, x, y, w, h, color, style, tag, context})
 }
 ```
 
 **속성:**
-- `id`: 요소의 고유 식별자
-- `color`: 색상
-- `context`: 추가 데이터 (선택)
+- `id`: 요소의 고유 식별자 (string|null)
+- `x`: x 좌표 (number)
+- `y`: y 좌표 (number)
+- `w`: 너비 (number)
+- `h`: 높이 (number)
+- `color`: 채우기 색상 (string, 기본값: 'gray')
+- `style`: 스타일 재정의 (Object, 기본값: {})
+- `tag`: 그리기 모드 ('fill'|'line', 기본값: 'fill')
+- `context`: 캔버스 컨텍스트 (CanvasRenderingContext2D|null)
 
 **역할:**
-- 순수 데이터 클래스
+- SuperElement를 상속받는 직사각형 요소 클래스
 - 그리드 셀에 배치될 실제 요소
+- 위치, 크기, 색상, 스타일 정보 포함
 
 **사용 예시:**
 ```javascript
-const element = new RectElement({id: 'cell1', color: 'red', context: 'data'});
+const element = new RectElement({
+  id: 'cell1', 
+  x: 50, 
+  y: 50, 
+  w: 100, 
+  h: 100, 
+  color: 'red', 
+  tag: 'fill'
+});
 ```
 
 ---
@@ -205,6 +220,7 @@ grid.drawGridLines({x: 150, y: 150, width: 300, height: 300});
 ✅ 요소 저장 및 관리
 ✅ 요소 위치 추적 (ElementContainer)
 ✅ 빌더 패턴을 통한 편의성
+✅ RectElement 클래스 주석 및 문서화 (속성, 영어/한글 주석)
 
 ---
 
