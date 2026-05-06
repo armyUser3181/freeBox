@@ -38,6 +38,7 @@ export class Block extends SuperElement {
         this.container = new ElementContainer({id, x, y, w, h, color, style, tag, context});
         this.shape = shape;
         this.moveState = null;
+        this.isLocked = false;
         this.buildShape(shape, draw);
     }
 
@@ -233,6 +234,47 @@ export class Block extends SuperElement {
         }
 
         return this;
+    }
+
+    /**
+     * Locks the block in place.
+     * @returns {Block}
+     */
+    lock() {
+        this.isLocked = true;
+        this.moveState = null;
+        return this;
+    }
+
+    /**
+     * Decomposes the block into individual RectElements stored in a new Block.
+     * 블록을 개별 RectElements로 분해하여 새로운 Block에 저장합니다.
+     * @returns {Block}
+     */
+    decompose() {
+        const decomposedBlock = new Block({
+            id: `decomposed_${this.id}`,
+            x: this.x,
+            y: this.y,
+            color: this.color,
+            tag: this.tag
+        });
+
+        this.getRectElements().forEach((rect) => {
+            const newRect = new RectElement({
+                x: rect.x,
+                y: rect.y,
+                w: rect.w,
+                h: rect.h,
+                color: rect.color,
+                style: rect.style,
+                tag: rect.tag
+            });
+            decomposedBlock.container.addElement(newRect);
+        });
+
+        decomposedBlock.isLocked = true;
+        return decomposedBlock;
     }
 
     /**

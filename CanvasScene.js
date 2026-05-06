@@ -13,12 +13,14 @@ class CanvasScene {
     this.canvas = canvas;
     this.draw = new Draw(canvas);
     this.blocks = [];
+    this.lockedBlocks = [];
     this.events = [];
     this.header = {
       title: '',
       score: 0,
       life: 0
     };
+    this.floorY = canvas.height - 20;
     this.running = false;
     this.lastTimestamp = null;
     this.animationFrameId = null;
@@ -96,6 +98,7 @@ class CanvasScene {
 
   drawAll() {
     this.clear();
+    this.lockedBlocks.forEach((block) => block.draw(this.draw));
     this.blocks.forEach((block) => block.draw(this.draw));
     this.drawHeader();
     return this;
@@ -134,9 +137,35 @@ class CanvasScene {
 
   update(deltaTime = 0) {
     this.blocks.forEach((block) => {
+      if (block.isLocked) {
+        return;
+      }
+
       if (typeof block.applyMove === 'function' && block.moveState) {
         const previousPosition = { x: block.x, y: block.y };
         block.applyMove(deltaTime);
+
+        this.emitEvent('blockMoving', { block, previousPosition });
+
+        const bounds = block.getBounds();
+        if (bounds.bottom >= this.floorY) {
+          block.x = previousPosition.x;
+          block.y = previousPosition.y;
+          block.lock();
+
+          const decomposed = block.decompose();
+          this.lockedBlocks.unshift(decomposed);
+          this.removeBlock((b) => b === block);
+
+          this.emitEvent('blockLocked', {
+            block,
+            decomposedBlock: decomposed,
+            position: { x: block.x, y: block.y }
+          });
+
+          return;
+        }
+
         const collisions = this.getCollisions(block);
         if (collisions.length > 0) {
           block.x = previousPosition.x;

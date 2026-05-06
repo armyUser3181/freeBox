@@ -71,8 +71,9 @@ class Draw {
       this.ctx.fillText(text, x, y);
     } else if (tag === 'line') {
       this.ctx.strokeText(text, x, y);
-    this.ctx.restore();
     }
+
+    this.ctx.restore();
   }
 }
 
