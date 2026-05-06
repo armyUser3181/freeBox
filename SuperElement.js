@@ -16,6 +16,7 @@ class SuperElement {
    * @param {*} [params.context=null] - arbitrary metadata
    */
   constructor({
+    drawInstance = null,
     id = null,
     x = 0,
     y = 0,
@@ -26,6 +27,7 @@ class SuperElement {
     tag = 'fill',
     context = null
   } = {}) {
+    this.drawInstance = drawInstance;
     this.id = id;
     this.x = x;
     this.y = y;

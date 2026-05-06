@@ -1,9 +1,9 @@
 
 깃허브 코파일럿 사용했는데 개신기하네
 
-# Canvas Grid System
+# Canvas Block System
 
-Canvas를 사용하여 그리드 기반 UI를 구축하는 시스템입니다.
+Canvas를 사용하여 블록 기반 UI를 구축하는 시스템입니다.
 
 ## 📁 파일 구조
 
@@ -32,37 +32,7 @@ draw.rect({x: 150, y: 150, w: 100, h: 100, color: 'blue', tag: 'fill'});
 
 ---
 
-### 2. **GridClass.js** - 그리드 관리 클래스
-```javascript
-class Grid {
-  constructor(draw)
-  addElement(element)
-  drawGridLines({x, y, cols, rows, width, height, borderWidth, color})
-  drawGridBackground({x, y, cols, rows, width, height, borderWidth, color})
-}
-```
-
-**기능:**
-- 그리드 라인 그리기
-- 그리드 배경 그리기 (테두리 제외)
-- 요소(element) 저장 및 관리
-
-**파라미터 기본값:**
-- `cols, rows`: 3x3
-- `width, height`: 120x120
-- `borderWidth`: 1px
-- `x, y`: 0, 0 (중앙 기준)
-
-**사용 예시:**
-```javascript
-const grid = new Grid(draw);
-grid.drawGridBackground({x: 150, y: 150, width: 300, height: 300, color: 'white'});
-grid.drawGridLines({x: 150, y: 150, width: 300, height: 300, color: 'black'});
-```
-
----
-
-### 3. **RectElement.js** - 직사각형 요소
+### 2. **RectElement.js** - 직사각형 요소
 ```javascript
 class RectElement extends SuperElement {
   constructor({id, x, y, w, h, color, style, tag, context})
@@ -82,7 +52,7 @@ class RectElement extends SuperElement {
 
 **역할:**
 - SuperElement를 상속받는 직사각형 요소 클래스
-- 그리드 셀에 배치될 실제 요소
+- 블록을 구성하는 기본 요소
 - 위치, 크기, 색상, 스타일 정보 포함
 
 **사용 예시:**
@@ -100,31 +70,62 @@ const element = new RectElement({
 
 ---
 
-### 4. **ElementContainer.js** - 요소 컨테이너
+### 3. **ElementContainer.js** - 요소 컨테이너
 ```javascript
-class ElementContainer {
-  constructor({row, col, element})
-  setPosition(row, col)
-  getPosition()
-  getElement()
-  setElement(element)
+class ElementContainer extends SuperElement {
+  constructor({id, x, y, w, h, color, style, tag, context, elements})
+  addElement(element)
+  getElements()
+  removeElement(predicate)
 }
 ```
 
 **기능:**
-- 요소의 위치 정보 관리 (row, col)
+- 요소의 위치 정보 관리
 - 실제 요소(element) 참조
+- 요소 추가, 조회, 제거
 
 **구조:**
 ```
 ElementContainer
-├─ row, col (그리드 내 위치)
-└─ element (RectElement 등 실제 요소)
+├─ elements (Array) - 포함된 요소들
+└─ SuperElement 속성들 (x, y, w, h, etc.)
 ```
 
 **사용 예시:**
 ```javascript
-const container = new ElementContainer({row: 1, col: 1, element});
+const container = new ElementContainer({x: 100, y: 100});
+container.addElement(rectElement);
+```
+
+---
+
+### 4. **block.js** - 블록 클래스
+```javascript
+class Block extends SuperElement {
+  constructor({id, x, y, w, h, color, style, tag, context, shape})
+  buildShape(shape)
+  getShapeRects(shape)
+  getContainer()
+  draw(draw)
+}
+```
+
+**기능:**
+- ElementContainer를 가지고 RectElement들을 배치하여 모양 생성
+- 다양한 블록 모양 지원 ('O', 'T', 'L', '+')
+- 블록 렌더링
+
+**모양 예시:**
+- 'O': 2x2 정사각형
+- 'T': T자 모양
+- 'L': L자 모양
+- '+': 십자 모양
+
+**사용 예시:**
+```javascript
+const block = new Block({x: 150, y: 150, shape: 'T'});
+block.draw(draw);
 ```
 
 ---
@@ -165,35 +166,23 @@ buildGrid(grid, [
 ### 1. 기본 셋업
 ```javascript
 import Draw from './DrawClass.js';
-import Grid from './GridClass.js';
+import { Block } from './block.js';
 import RectElement from './RectElement.js';
-import { buildGrid } from './lib.js';
 
 const canvas = document.getElementById('canvas');
 const draw = new Draw(canvas);
-const grid = new Grid(draw);
 ```
 
-### 2. 요소 생성
+### 2. 블록 생성
 ```javascript
-const el1 = new RectElement({id: 'a', color: 'red'});
-const el2 = new RectElement({id: 'b', color: 'blue'});
-// ... 더 많은 요소
+const block1 = new Block({x: 100, y: 100, shape: 'O', color: 'blue'});
+const block2 = new Block({x: 200, y: 200, shape: 'T', color: 'purple'});
 ```
 
-### 3. 그리드 배치
+### 3. 렌더링
 ```javascript
-buildGrid(grid, {
-  b11: el1,
-  b22: el2
-  // 나머지는 자동으로 null 처리
-});
-```
-
-### 4. 렌더링
-```javascript
-grid.drawGridBackground({x: 150, y: 150, width: 300, height: 300});
-grid.drawGridLines({x: 150, y: 150, width: 300, height: 300});
+block1.draw(draw);
+block2.draw(draw);
 ```
 
 ---
@@ -214,20 +203,17 @@ grid.drawGridLines({x: 150, y: 150, width: 300, height: 300});
 ## 🔧 현재 기능
 
 ✅ Canvas 기반 도형 그리기
-✅ 3x3 그리드 시스템
-✅ 그리드 라인 렌더링
-✅ 그리드 배경 렌더링 (테두리 제외)
-✅ 요소 저장 및 관리
-✅ 요소 위치 추적 (ElementContainer)
-✅ 빌더 패턴을 통한 편의성
 ✅ RectElement 클래스 주석 및 문서화 (속성, 영어/한글 주석)
+✅ ElementContainer 클래스 개선 (요소 관리)
+✅ Block 클래스 구현 (ElementContainer를 활용한 모양 생성)
+✅ 다양한 블록 모양 지원 ('O', 'T', 'L', '+')
 
 ---
 
 ## 🎯 다음 진행 사항 (예정)
 
-- [ ] 요소 렌더링 함수 추가
-- [ ] 마우스 상호작용 추가
-- [ ] 요소 클릭 이벤트 처리
-- [ ] 드래그 & 드롭 구현
-- [ ] 애니메이션 효과 추가
+- [ ] 블록 이동 및 회전 기능 추가
+- [ ] 블록 충돌 감지
+- [ ] 게임 루프 구현 (블록 떨어짐)
+- [ ] 점수 시스템
+- [ ] 레벨 및 난이도 조절

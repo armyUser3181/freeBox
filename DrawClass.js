@@ -26,7 +26,7 @@ class Draw {
    */
   rect({x, y, w, h, color = 'black', tag = 'fill', style = {}}) {
     // Convert center coordinates to top-left canvas coordinates.
-    // 중앙 좌표를 캔버스 좌상단 좌표로 변환합니다.
+    // 중앙 좌표를 캔버스로 좌상단 좌표로 변환합니다.
     const left = x - w / 2;
     const top = y - h / 2;
 
@@ -42,6 +42,37 @@ class Draw {
     }
 
     this.ctx.restore();
+  }
+
+  /**
+   * Draws text on the canvas.
+   * 캔버스에 텍스트를 그립니다.
+   * @param {Object} params
+   * @param {number} params.x - center x-coordinate
+   * @param {number} params.y - center y-coordinate
+   * @param {string} params.text - text string
+   * @param {string} [params.color='black']
+   * @param {string} [params.font='16px sans-serif']
+   * @param {'fill'|'line'} [params.tag='fill']
+   * @param {string} [params.align='center']
+   * @param {string} [params.baseline='middle']
+   * @param {Object} [params.style={}] - optional style override
+   */
+  text({x, y, text = '', color = 'black', font = '16px sans-serif', tag = 'fill', align = 'center', baseline = 'middle', style = {}}) {
+    this.ctx.save();
+    this.ctx.font = style.font || font;
+    this.ctx.textAlign = align;
+    this.ctx.textBaseline = baseline;
+    this.ctx.fillStyle = style.fillStyle || color;
+    this.ctx.strokeStyle = style.strokeStyle || color;
+    this.ctx.lineWidth = style.lineWidth || this.ctx.lineWidth;
+
+    if (tag === 'fill') {
+      this.ctx.fillText(text, x, y);
+    } else if (tag === 'line') {
+      this.ctx.strokeText(text, x, y);
+    this.ctx.restore();
+    }
   }
 }
 

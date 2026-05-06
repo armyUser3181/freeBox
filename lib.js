@@ -20,28 +20,20 @@ export function helloWorldPrint() {
 }
 
 /**
- * Builds the grid by adding elements into grid cells.
- * 요소를 그리드 셀에 추가하여 그리드를 구성합니다.
- * @param {Object} grid - CridElement instance
- * @param {Object|Array} elements - cell values in object or 2D array form
+ * Selects an item from an array.
+ * 배열에서 하나의 항목을 선택합니다.
+ * @param {Array} values
+ * @param {number} [index] - optional index; if omitted, select randomly
+ * @returns {*}
  */
-export function buildGrid(grid, elements) {
-  // elements format: { b11, b12, b13, b21, b22, b23, b31, b32, b33 }
-  // or 2D array: [[el00, el01, el02], [el10, el11, el12], [el20, el21, el22]]
-  const elementArray = Array.isArray(elements) ? elements : [
-    [elements.b11, elements.b12, elements.b13],
-    [elements.b21, elements.b22, elements.b23],
-    [elements.b31, elements.b32, elements.b33]
-  ];
-
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 3; col++) {
-      const element = elementArray[row][col];
-      if (element && typeof grid.addElement === 'function') {
-        grid.addElement(row, col, element);
-      }
+export function select(values, index) {
+    if (!Array.isArray(values) || values.length === 0) {
+        return undefined;
     }
-  }
-
-  return grid;
+    if (typeof index === 'number') {
+        return values[index < 0 ? 0 : Math.min(index, values.length - 1)];
+    }
+    const randomIndex = Math.floor(Math.random() * values.length);
+    return values[randomIndex];
 }
+
